@@ -21,16 +21,31 @@ public class MoveOpponent : MonoBehaviour
     float startingY;
     float startingZ;
 
+    public bool isMoving;
+    public bool isAttacking;
+    public int attackChance = 50;
+    public bool isBlocking;
+
+    public float actionInterval = 3f;
+    public float actionCooldown = 0.5f;
+
+    public BlockScript block;
+
     void Start()
     {
         blockDirection = Direction.Left;
         startingY = transform.position.y;
         startingZ = transform.position.z;
+
+        DecideAction();
+        blockDirection = Direction.None;
     }
 
     void Update()
     {
-        MoveToPlayer();
+        if(isMoving)
+            MoveToPlayer();
+
     }
 
     public void TakeDamage(float damage, Direction direction)
@@ -45,7 +60,8 @@ public class MoveOpponent : MonoBehaviour
         {
             opponentStamina -= (damage * 2);
             if (opponentStamina < 0)
-                opponentStamina = 0;         
+                opponentStamina = 0;
+            FinishBlock();
         }
         else
         {
@@ -101,5 +117,115 @@ public class MoveOpponent : MonoBehaviour
         float step = opponentSpeed * Time.deltaTime;
         Vector3 target = new Vector3(playerHorizontalPosition, startingY, startingZ);
         transform.position = Vector3.MoveTowards(transform.position, target, step);
+    }
+
+    int RNG()
+    {
+        int randInt = Random.Range(1, 100);
+        return randInt;
+    }
+    public void RecieveAttackDirection(Direction direction)
+    {
+        if (isAttacking)
+            return;
+
+        int randInt = RNG();
+
+        int blockChance = 100;
+
+        switch(direction)
+        {
+            case Direction.Up:
+                blockChance = 75;
+                break;
+            case Direction.Down:
+                blockChance = 50;
+                break;
+            case Direction.Left:
+                blockChance = 30;
+                break;
+            case Direction.Right:
+                blockChance = 40;
+                break;
+            case Direction.Center:
+                blockChance = 20;
+                break;
+        }
+        if (randInt < blockChance)
+            Block(direction);
+    }
+
+    void DecideAction()
+    {
+        int randInt = RNG();
+
+        if(randInt < attackChance)
+        {
+            //Attack();
+        }
+        else
+        {
+            Move();
+        }
+
+        StartCoroutine(WaitForNextAction());
+    }
+    void Block(Direction direction)
+    {
+        isBlocking = true;
+        isAttacking = false;
+        isMoving = false;
+        DecideBlockDirection(direction);
+
+        block.BlockDirection(direction);
+    }
+    void DecideBlockDirection(Direction direction)
+    {
+        switch (direction)
+        {
+            case Direction.Up:
+                blockDirection = Direction.Up;
+                break;
+            case Direction.Down:
+                blockDirection = Direction.Down;
+                break;
+            case Direction.Left:
+                blockDirection = Direction.Right;
+                break;
+            case Direction.Right:
+                blockDirection = Direction.Left;
+                break;
+            case Direction.Center:
+                blockDirection = Direction.Center;
+                break;
+            case Direction.None:
+                FinishBlock();
+                break;
+        }
+    }
+    void FinishBlock()
+    {
+        blockDirection = Direction.None;
+        block.BlockDirection(blockDirection);
+    }
+    void Attack()
+    {
+        if (isBlocking)
+            return;
+
+        isAttacking = true;
+        isBlocking = false;
+        isMoving = false;
+    }
+    void Move()
+    {
+        isMoving = true;
+        isAttacking = false;
+        isBlocking = false;
+    }
+    IEnumerator WaitForNextAction()
+    {
+        yield return new WaitForSeconds(actionInterval);
+        DecideAction();
     }
 }

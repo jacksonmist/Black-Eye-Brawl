@@ -63,4 +63,9 @@ public class GameManager : MonoBehaviour
     {
         opponent.UpdatePlayerPosition(player.transform.position.x);
     }
+
+    public void RecievePlayerDirection(Direction direction)
+    {
+        opponent.RecieveAttackDirection(direction);
+    }
 }

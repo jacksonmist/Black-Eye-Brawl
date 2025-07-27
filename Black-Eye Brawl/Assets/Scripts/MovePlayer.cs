@@ -67,6 +67,8 @@ public class MovePlayer : MonoBehaviour
     public Transform leftFist;
     public float armSpeed;
 
+    public BlockScript block;
+
     [Header("Block Targets")]
     public Vector3 centerRight = new Vector3(0.1f, 0.2f, 6f);
     public Vector3 centerLeft = new Vector3(-0.1f, 0.2f, 6f);
@@ -228,6 +230,7 @@ public class MovePlayer : MonoBehaviour
         playerInput.DeactivateInput();
         if (magnitude < crossBoundary)
         {
+            SendAttackDirection(Direction.Center);
             yield return new WaitForSeconds(crossSpeed);
             Cross();
         }
@@ -235,26 +238,33 @@ public class MovePlayer : MonoBehaviour
         {
             if (angle > 45 && angle <= 135)
             {
-                yield return new WaitForSeconds(uppercutSpeed);
-                
+                SendAttackDirection(Direction.Down);
+                yield return new WaitForSeconds(uppercutSpeed);               
                 Uppercut();
             }               
             else if (angle > 135 && angle <= 225)
             {
+                SendAttackDirection(Direction.Left);
                 yield return new WaitForSeconds(hookSpeed);
                 LeftHook();
             }                
             else if (angle > 225 && angle <= 315)
             {
+                SendAttackDirection(Direction.Up);
                 yield return new WaitForSeconds(hammerSpeed);
                 Hammer();
             }               
             else if (angle > 315 || angle <= 45)
             {
+                SendAttackDirection(Direction.Right);
                 yield return new WaitForSeconds(hookSpeed);
                 RightHook();
             }             
         }
+    }
+    void SendAttackDirection(Direction direction)
+    {
+        manager.RecievePlayerDirection(direction);
     }
     void FinishAttack()
     {
@@ -314,6 +324,7 @@ public class MovePlayer : MonoBehaviour
         isBlocking = false;
         rightArmTarget.localPosition = rightTargetHomePosition;
         leftArmTarget.localPosition = leftTargetHomePosition;
+        blockDirection = Direction.None;
         ResetArmRotationTarget();
     }
     void ArmsToTarget()
