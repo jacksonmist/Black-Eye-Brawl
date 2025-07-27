@@ -44,7 +44,8 @@ public class MoveOpponent : MonoBehaviour
         if (CheckBlock(direction))
         {
             opponentStamina -= (damage * 2);
-            parentCoroutine = StartCoroutine(WaitForStaminaRegen());
+            if (opponentStamina < 0)
+                opponentStamina = 0;         
         }
         else
         {
@@ -54,6 +55,7 @@ public class MoveOpponent : MonoBehaviour
         if (opponentHealth < 0)
             opponentHealth = 0;
 
+        parentCoroutine = StartCoroutine(WaitForStaminaRegen());
         print($"Opponent Health {opponentHealth}");
         print($"Opponent Stamina {opponentStamina}");
     }
@@ -62,10 +64,14 @@ public class MoveOpponent : MonoBehaviour
         bool isBlocked = false;
 
         if (direction == Direction.Right && blockDirection == Direction.Left)
+        {
             isBlocked = true;
+        }          
         else if (direction == Direction.Left && blockDirection == Direction.Right)
+        {
             isBlocked = true;
-        else if (direction == blockDirection)
+        }          
+        else if (direction == blockDirection && (direction == Direction.Down || direction == Direction.Up))
             isBlocked = true;
 
         return isBlocked;
