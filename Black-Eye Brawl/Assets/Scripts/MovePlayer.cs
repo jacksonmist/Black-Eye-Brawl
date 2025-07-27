@@ -19,6 +19,7 @@ public class MovePlayer : MonoBehaviour
 
     public bool isAttacking;
     public bool isBlocking;
+    public bool isBlocked;
     public bool isBusy;
 
     public float playerSpeed;
@@ -51,6 +52,30 @@ public class MovePlayer : MonoBehaviour
     public float hammerSpeed = 1.5f;
 
     public float playerHealth = 100;
+
+    public Transform rightArmTarget;
+    public Transform leftArmTarget;
+
+    public Vector3 rightTargetHomePosition;
+    public Vector3 leftTargetHomePosition;
+
+    public Transform rightFist;
+    public Transform leftFist;
+    public float armSpeed;
+
+    [Header("Block Targets")]
+    public Vector3 centerRight = new Vector3(0.1f, 0.2f, 6f);
+    public Vector3 centerLeft = new Vector3(-0.1f, 0.2f, 6f);
+
+    public Vector3 rightBlockRightArm = new Vector3(0.59f, 0.32f, 5.8f);
+
+    public Vector3 leftBlockLeftArm = new Vector3(-0.75f, 0.3f, 7.4f);
+
+    public Vector3 upBlockRightArm = new Vector3(0.4f, 0.65f, 5.8f);
+    public Vector3 upBlockLeftArm = new Vector3(-0.4f, 0.6f, 7.4f);
+
+    public Vector3 downBlockRightArm = new Vector3(0.4f, 0.39f, 5.8f);
+    public Vector3 downBlockLeftArm = new Vector3(-0.4f, 0.29f, 7.4f);
     void Start()
     {
         moveAction = playerInput.actions.FindAction("Move");
@@ -59,6 +84,13 @@ public class MovePlayer : MonoBehaviour
 
         startingY = transform.position.y;
         startingZ = transform.position.z;
+      
+        rightTargetHomePosition = rightFist.localPosition;
+        leftTargetHomePosition = leftFist.localPosition;
+        rightArmTarget.localPosition = rightTargetHomePosition;
+        leftArmTarget.localPosition = leftTargetHomePosition;
+
+        print(rightTargetHomePosition);
 
         LockCursor();
     }
@@ -66,6 +98,7 @@ public class MovePlayer : MonoBehaviour
     void Update()
     {
         ReadActions();
+        ArmsToTarget();
     }
 
     void ReadActions()
@@ -85,7 +118,7 @@ public class MovePlayer : MonoBehaviour
         else
         {
             UnlockCursor();
-            if (attackVal == 1 || isAttacking)
+            if ((attackVal == 1 || isAttacking) && !isBlocking)
                 Attack();
             else if (blockVal == 1 || isBlocking)
                 Block();
@@ -172,42 +205,115 @@ public class MovePlayer : MonoBehaviour
     void Cross()
     {
         float hitPosition = transform.position.x;
-        print("Cross");
         SendHitPosition(hitPosition, crossDamage, Direction.Center);
         FinishAttack();
     }
     void RightHook()
-    {
-        print("Right Hook");
+    {;
         float hitPosition = transform.position.x - 0.5f;
         SendHitPosition(hitPosition, rightHookDamage, Direction.Right);
         FinishAttack();
     }
     void LeftHook()
     {
-        print("Left Hook");
         float hitPosition = transform.position.x + 0.5f;
         SendHitPosition(hitPosition, leftHookDamage, Direction.Left);
         FinishAttack();
     }
     void Uppercut()
     {
-        print("Uppercut");
         float hitPosition = transform.position.x;
         SendHitPosition(hitPosition, uppercutDamage, Direction.Down);
         FinishAttack();
     }
     void Hammer()
     {
-        print("Hammer");
         float hitPosition = transform.position.x;
         SendHitPosition(hitPosition, hammerDamage, Direction.Up);
         FinishAttack();
+    }
+    void FinishBlock()
+    {
+        playerInput.ActivateInput();
+        isBusy = false;
+        isBlocking = false;
+        rightArmTarget.localPosition = rightTargetHomePosition;
+        leftArmTarget.localPosition = leftTargetHomePosition;
+    }
+    void ArmsToTarget()
+    {
+        rightFist.localPosition = Vector3.Lerp(rightFist.localPosition, rightArmTarget.localPosition, armSpeed * Time.deltaTime);
+        leftFist.localPosition = Vector3.Lerp(leftFist.localPosition, leftArmTarget.localPosition, armSpeed * Time.deltaTime);
+
+        float rightDistance = Vector3.Distance(rightFist.localPosition, rightArmTarget.localPosition);
+        float leftDistance = Vector3.Distance(leftFist.localPosition, leftArmTarget.localPosition);
+
+        if (rightDistance < 0.2f && leftDistance < 0.2f && isBlocking)
+            isBlocked = true;
+        else
+            isBlocked = false;
     }
 
     void Block()
     {
         isBlocking = true;
+
+        Vector2 mousePosition = GetMousePosition();
+        float vectorMagnitude = mousePosition.magnitude;
+        float angle = CalculateAngle(mousePosition);
+
+        DecideBlock(vectorMagnitude, angle);
+
+        if (blockVal == 0)
+        {
+            FinishBlock();
+        }  
+    }
+    void DecideBlock(float magnitude, float angle)
+    {
+        if (magnitude < crossBoundary)
+            CenterBlock();
+        else
+        {
+            if (angle > 45 && angle <= 135)
+                UpBlock();
+            else if (angle > 135 && angle <= 225)
+                LeftBlock();
+            else if (angle > 225 && angle <= 315)
+                DownBlock();
+            else if (angle > 315 || angle <= 45)
+                RightBlock();
+        }
+    }
+    void CenterBlock()
+    {
+        rightArmTarget.localPosition = centerRight;
+        leftArmTarget.localPosition = centerLeft;
+        blockDirection = Direction.Center;
+    }
+    void RightBlock()
+    {
+        rightArmTarget.localPosition = rightBlockRightArm;
+        leftArmTarget.localPosition = leftTargetHomePosition;
+        blockDirection = Direction.Right;
+    }
+    void LeftBlock()
+    {
+        leftArmTarget.localPosition = leftBlockLeftArm;
+        rightArmTarget.localPosition = rightTargetHomePosition;
+        blockDirection = Direction.Left;
+    }
+    void UpBlock()
+    {
+        rightArmTarget.localPosition = upBlockRightArm;
+        leftArmTarget.localPosition = upBlockLeftArm;
+        blockDirection = Direction.Up;
+    }
+    void DownBlock()
+    {
+        rightArmTarget.localPosition = downBlockRightArm;
+        leftArmTarget.localPosition = downBlockLeftArm;
+        blockDirection = Direction.Down;
     }
 
     void LockCursor()

@@ -6,7 +6,8 @@ public enum Direction
     Down,
     Left,
     Right,
-    Center
+    Center,
+    None
 };
 public class GameManager : MonoBehaviour
 {
