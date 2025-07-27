@@ -71,7 +71,7 @@ public class MoveOpponent : MonoBehaviour
         {
             isBlocked = true;
         }          
-        else if (direction == blockDirection && (direction == Direction.Down || direction == Direction.Up))
+        else if (direction == blockDirection && (direction == Direction.Down || direction == Direction.Up || direction == Direction.Center))
             isBlocked = true;
 
         return isBlocked;

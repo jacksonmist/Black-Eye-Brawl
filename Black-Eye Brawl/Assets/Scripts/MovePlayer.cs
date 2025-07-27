@@ -51,7 +51,11 @@ public class MovePlayer : MonoBehaviour
     public float uppercutSpeed = 1f;
     public float hammerSpeed = 1.5f;
 
+    [Header("Player Stats")]
     public float playerHealth = 100;
+    public float playerStamina = 100;
+    public float staminaRecoveryCooldown = 1;
+    public float regenRate = 0.1f;
 
     public Transform rightArmTarget;
     public Transform leftArmTarget;
@@ -71,11 +75,25 @@ public class MovePlayer : MonoBehaviour
 
     public Vector3 leftBlockLeftArm = new Vector3(-0.75f, 0.3f, 7.4f);
 
-    public Vector3 upBlockRightArm = new Vector3(0.4f, 0.65f, 5.8f);
-    public Vector3 upBlockLeftArm = new Vector3(-0.4f, 0.6f, 7.4f);
+    public Vector3 upBlockRightArm = new Vector3(0.17f, 0.46f, 4.7f);
+    public Vector3 upBlockLeftArm = new Vector3(-0.1f, 0.48f, 5.89f);
+    public Vector3 upRightRotationTarget = new Vector3(0f, 180f, 67f);
+    public Vector3 upLeftRotationTarget = new Vector3(0f, 180f, -61f);
 
     public Vector3 downBlockRightArm = new Vector3(0.4f, 0.39f, 5.8f);
     public Vector3 downBlockLeftArm = new Vector3(-0.4f, 0.29f, 7.4f);
+    public Vector3 downRightRotationTarget = new Vector3(0f, 180f, 85f);
+    public Vector3 downLeftRotationTarget = new Vector3(0f, 180f, -85f);
+
+    public Quaternion homeRotationTarget;
+
+    public Quaternion rightRotationTarget;
+    public Quaternion leftRotationTarget;
+    public float rotationSpeed = 10;
+
+    public Coroutine parentCoroutine;
+    public Coroutine childCoroutine;
+
     void Start()
     {
         moveAction = playerInput.actions.FindAction("Move");
@@ -85,12 +103,13 @@ public class MovePlayer : MonoBehaviour
         startingY = transform.position.y;
         startingZ = transform.position.z;
       
-        rightTargetHomePosition = rightFist.localPosition;
-        leftTargetHomePosition = leftFist.localPosition;
+        rightTargetHomePosition = rightArmTarget.localPosition;
+        leftTargetHomePosition = leftArmTarget.localPosition;
+
         rightArmTarget.localPosition = rightTargetHomePosition;
         leftArmTarget.localPosition = leftTargetHomePosition;
 
-        print(rightTargetHomePosition);
+        homeRotationTarget = rightFist.rotation;
 
         LockCursor();
     }
@@ -124,7 +143,63 @@ public class MovePlayer : MonoBehaviour
                 Block();
         }
     }
+    public void TakeDamage(float damage, Direction direction)
+    {
+        if (parentCoroutine != null)
+            StopCoroutine(parentCoroutine);
+        if (childCoroutine != null)
+            StopCoroutine(childCoroutine);
 
+
+        if (CheckBlock(direction))
+        {
+            playerStamina -= (damage * 2);
+            if (playerStamina < 0)
+                playerStamina = 0;
+        }
+        else
+        {
+            playerHealth -= damage;
+        }
+
+        if (playerStamina < 0)
+            playerStamina = 0;
+
+        parentCoroutine = StartCoroutine(WaitForStaminaRegen());
+    }
+    IEnumerator WaitForStaminaRegen()
+    {
+        yield return new WaitForSeconds(staminaRecoveryCooldown);
+        childCoroutine = StartCoroutine(RegenStamina());
+    }
+    IEnumerator RegenStamina()
+    {
+        yield return new WaitForSeconds(regenRate);
+        playerStamina += 1;
+        if (playerStamina >= 100)
+        {
+            playerStamina = 100;
+            yield break;
+        }
+        childCoroutine = StartCoroutine(RegenStamina());
+    }
+    bool CheckBlock(Direction direction)
+    {
+        bool isBlocked = false;
+
+        if (direction == Direction.Right && blockDirection == Direction.Left)
+        {
+            isBlocked = true;
+        }
+        else if (direction == Direction.Left && blockDirection == Direction.Right)
+        {
+            isBlocked = true;
+        }
+        else if (direction == blockDirection && (direction == Direction.Down || direction == Direction.Up || direction == Direction.Center))
+            isBlocked = true;
+
+        return isBlocked;
+    }
     void Move()
     {
         moveVector.x = -moveVal * playerSpeed * Time.deltaTime;
@@ -239,14 +314,18 @@ public class MovePlayer : MonoBehaviour
         isBlocking = false;
         rightArmTarget.localPosition = rightTargetHomePosition;
         leftArmTarget.localPosition = leftTargetHomePosition;
+        ResetArmRotationTarget();
     }
     void ArmsToTarget()
     {
-        rightFist.localPosition = Vector3.Lerp(rightFist.localPosition, rightArmTarget.localPosition, armSpeed * Time.deltaTime);
-        leftFist.localPosition = Vector3.Lerp(leftFist.localPosition, leftArmTarget.localPosition, armSpeed * Time.deltaTime);
+        rightFist.position = Vector3.Lerp(rightFist.position, rightArmTarget.position, armSpeed * Time.deltaTime);
+        leftFist.position = Vector3.Lerp(leftFist.position, leftArmTarget.position, armSpeed * Time.deltaTime);
 
-        float rightDistance = Vector3.Distance(rightFist.localPosition, rightArmTarget.localPosition);
-        float leftDistance = Vector3.Distance(leftFist.localPosition, leftArmTarget.localPosition);
+        rightFist.rotation = Quaternion.Slerp(rightFist.rotation, rightRotationTarget, rotationSpeed * Time.deltaTime);
+        leftFist.rotation = Quaternion.Slerp(leftFist.rotation, leftRotationTarget, rotationSpeed * Time.deltaTime);
+
+        float rightDistance = Vector3.Distance(rightFist.position, rightArmTarget.position);
+        float leftDistance = Vector3.Distance(leftFist.position, leftArmTarget.position);
 
         if (rightDistance < 0.2f && leftDistance < 0.2f && isBlocking)
             isBlocked = true;
@@ -289,31 +368,53 @@ public class MovePlayer : MonoBehaviour
     {
         rightArmTarget.localPosition = centerRight;
         leftArmTarget.localPosition = centerLeft;
+
+        ResetArmRotationTarget();
+
         blockDirection = Direction.Center;
     }
     void RightBlock()
     {
         rightArmTarget.localPosition = rightBlockRightArm;
         leftArmTarget.localPosition = leftTargetHomePosition;
+
+        ResetArmRotationTarget();
+
         blockDirection = Direction.Right;
     }
     void LeftBlock()
     {
         leftArmTarget.localPosition = leftBlockLeftArm;
         rightArmTarget.localPosition = rightTargetHomePosition;
+
+        ResetArmRotationTarget();
+
         blockDirection = Direction.Left;
     }
     void UpBlock()
     {
         rightArmTarget.localPosition = upBlockRightArm;
         leftArmTarget.localPosition = upBlockLeftArm;
+
+        rightRotationTarget.eulerAngles = upRightRotationTarget;
+        leftRotationTarget.eulerAngles = upLeftRotationTarget;
+
         blockDirection = Direction.Up;
     }
     void DownBlock()
     {
         rightArmTarget.localPosition = downBlockRightArm;
         leftArmTarget.localPosition = downBlockLeftArm;
+
+        rightRotationTarget.eulerAngles = downRightRotationTarget;
+        leftRotationTarget.eulerAngles = downLeftRotationTarget;
+
         blockDirection = Direction.Down;
+    }
+    void ResetArmRotationTarget()
+    {
+        rightRotationTarget = homeRotationTarget;
+        leftRotationTarget = homeRotationTarget;
     }
 
     void LockCursor()
