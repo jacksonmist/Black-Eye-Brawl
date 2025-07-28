@@ -151,6 +151,7 @@ public class MoveOpponent : MonoBehaviour
                 blockChance = 20;
                 break;
         }
+        blockChance = 100;
         if (randInt < blockChance)
             Block(direction);
     }
