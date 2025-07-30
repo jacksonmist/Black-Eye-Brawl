@@ -59,6 +59,13 @@ public class GameManager : MonoBehaviour
             opponent.TakeDamage(damage, direction);
         }
     }
+    public void RecieveOpponentHit(float xValue, float damage, Direction direction)
+    {
+        if (IsOpponentHit(xValue))
+        {
+            opponent.TakeDamage(damage, direction);
+        }
+    }
     void UpdateOpponentInfo()
     {
         opponent.UpdatePlayerPosition(player.transform.position.x);

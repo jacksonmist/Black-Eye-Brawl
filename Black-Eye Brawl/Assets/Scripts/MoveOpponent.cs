@@ -3,6 +3,8 @@ using System.Collections;
 
 public class MoveOpponent : MonoBehaviour
 {
+    public AnimationController animationController;
+
     public float opponentHealth = 100;
     public float opponentStamina = 100;
     public float staminaRecoveryCooldown = 1;
@@ -31,6 +33,13 @@ public class MoveOpponent : MonoBehaviour
 
     public BlockScript block;
 
+    [Header("Attack Damages")]
+    public float crossDamage = 10;
+    public float jabDamage = 5;
+    public float rightHookDamage = 20;
+    public float leftHookDamage = 15;
+    public float uppercutDamage = 20;
+    public float hammerDamage = 25;
     void Start()
     {
         blockDirection = Direction.Left;
@@ -151,7 +160,6 @@ public class MoveOpponent : MonoBehaviour
                 blockChance = 20;
                 break;
         }
-        blockChance = 100;
         if (randInt < blockChance)
             Block(direction);
     }
@@ -162,10 +170,14 @@ public class MoveOpponent : MonoBehaviour
 
         if(randInt < attackChance)
         {
-            //Attack();
+            block.DisableTargets();
+            animationController.SwitchToIdle();
+            Attack();
         }
         else
         {
+            block.EnableTargets();
+            animationController.SwitchToWalk();
             Move();
         }
 
@@ -173,6 +185,9 @@ public class MoveOpponent : MonoBehaviour
     }
     void Block(Direction direction)
     {
+        block.EnableTargets();
+        animationController.SwitchToIdle();
+
         isBlocking = true;
         isAttacking = false;
         isMoving = false;
@@ -214,9 +229,63 @@ public class MoveOpponent : MonoBehaviour
         if (isBlocking)
             return;
 
-        isAttacking = true;
+        float randInt = RNG();
+        randInt = 21;
+
+        if (randInt <= 20)
+            Cross();
+        else if (randInt <= 40)
+            RightHook();
+        else if (randInt <= 60)
+            LeftHook();
+        else if (randInt <= 80)
+            Uppercut();
+        else
+            Hammer();
+
+            isAttacking = true;
         isBlocking = false;
         isMoving = false;
+    }
+    void FinishAttack()
+    {
+
+    }
+    void SendHitPosition(float xValue, float damage, Direction direction)
+    {
+        manager.RecievePlayerHit(xValue, damage, direction);
+    }
+    void Cross()
+    {
+        float hitPosition = transform.position.x;
+        SendHitPosition(hitPosition, crossDamage, Direction.Center);
+        FinishAttack();
+    }
+    void RightHook()
+    {
+        animationController.RightHook();
+
+        float hitPosition = transform.position.x - 0.5f;
+        SendHitPosition(hitPosition, rightHookDamage, Direction.Right);
+        FinishAttack();
+    }
+    void LeftHook()
+    {
+        float hitPosition = transform.position.x + 0.5f;
+        SendHitPosition(hitPosition, leftHookDamage, Direction.Left);
+        FinishAttack();
+    }
+    void Uppercut()
+    {
+        float hitPosition = transform.position.x;
+        SendHitPosition(hitPosition, uppercutDamage, Direction.Down);
+        FinishAttack();
+    }
+    void Hammer()
+    {
+        float hitPosition = transform.position.x;
+        SendHitPosition(hitPosition, hammerDamage, Direction.Up);
+        FinishAttack();
     }
     void Move()
     {

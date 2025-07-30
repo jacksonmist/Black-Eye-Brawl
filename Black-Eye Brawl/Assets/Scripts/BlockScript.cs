@@ -39,6 +39,8 @@ public class BlockScript : MonoBehaviour
     public Quaternion rightRotationTarget;
     public Quaternion leftRotationTarget;
     public float rotationSpeed = 10;
+
+    bool targetsEnabled = true;
     void Start()
     {
         rightTargetHomePosition = rightArmTarget.localPosition;
@@ -48,11 +50,13 @@ public class BlockScript : MonoBehaviour
         leftArmTarget.localPosition = leftTargetHomePosition;
 
         homeRotationTarget = rightFist.rotation;
+        targetsEnabled = true;
     }
 
     void Update()
     {
-        ArmsToTarget();
+        if(targetsEnabled)
+            ArmsToTarget();
     }
     void FinishBlock()
     {
@@ -83,6 +87,15 @@ public class BlockScript : MonoBehaviour
             isBlocked = true;
         else
             isBlocked = false;
+    }
+    public void DisableTargets()
+    {
+        print("here");
+        targetsEnabled = false;
+    }
+    public void EnableTargets()
+    {
+        targetsEnabled = true;
     }
     public void BlockDirection(Direction direction)
     {
