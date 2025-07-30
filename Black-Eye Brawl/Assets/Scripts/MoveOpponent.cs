@@ -25,7 +25,7 @@ public class MoveOpponent : MonoBehaviour
 
     public bool isMoving;
     public bool isAttacking;
-    public int attackChance = 50;
+    public int baseAttackChance = 50;
     public bool isBlocking;
 
     public float actionInterval = 3f;
@@ -40,6 +40,13 @@ public class MoveOpponent : MonoBehaviour
     public float leftHookDamage = 15;
     public float uppercutDamage = 20;
     public float hammerDamage = 25;
+
+    [Header("Attack Speeds")]
+    public float crossSpeed = 0.5f;
+    public float jabSpeed = 0.25f;
+    public float hookSpeed = 1.5f;
+    public float uppercutSpeed = 1f;
+    public float hammerSpeed = 1.5f;
     void Start()
     {
         blockDirection = Direction.Left;
@@ -81,8 +88,6 @@ public class MoveOpponent : MonoBehaviour
             opponentHealth = 0;
 
         parentCoroutine = StartCoroutine(WaitForStaminaRegen());
-        print($"Opponent Health {opponentHealth}");
-        print($"Opponent Stamina {opponentStamina}");
     }
     bool CheckBlock(Direction direction)
     {
@@ -167,12 +172,20 @@ public class MoveOpponent : MonoBehaviour
     void DecideAction()
     {
         int randInt = RNG();
+        float attackChance = baseAttackChance;
+
+        float distanceToPlayer = Mathf.Abs(transform.position.x - playerHorizontalPosition);
+
+        if (distanceToPlayer < 1)
+            attackChance += 20;
+        else
+            attackChance -= 20;
 
         if(randInt < attackChance)
         {
             block.DisableTargets();
             animationController.SwitchToIdle();
-            Attack();
+            StartCoroutine(Attack());
         }
         else
         {
@@ -219,29 +232,50 @@ public class MoveOpponent : MonoBehaviour
                 break;
         }
     }
-    void FinishBlock()
+    public void FinishBlock()
     {
+        isBlocking = false;
         blockDirection = Direction.None;
         block.BlockDirection(blockDirection);
     }
-    void Attack()
+    IEnumerator Attack()
     {
         if (isBlocking)
-            return;
+            yield break;
 
         float randInt = RNG();
-        randInt = 21;
 
         if (randInt <= 20)
+        {
+            animationController.Cross();
+            yield return new WaitForSeconds(crossSpeed);
             Cross();
+        }           
         else if (randInt <= 40)
+        {
+            animationController.RightHook();
+            yield return new WaitForSeconds(hookSpeed);
             RightHook();
+        }         
         else if (randInt <= 60)
+        {
+            animationController.LeftHook();
+            yield return new WaitForSeconds(hookSpeed);
             LeftHook();
+        }          
         else if (randInt <= 80)
+        {
+            animationController.Uppercut();
+            yield return new WaitForSeconds(hookSpeed);
             Uppercut();
+        }          
         else
+        {
+            animationController.Hammer();
+            yield return new WaitForSeconds(hookSpeed);
             Hammer();
+        }
+            
 
             isAttacking = true;
         isBlocking = false;
@@ -249,11 +283,11 @@ public class MoveOpponent : MonoBehaviour
     }
     void FinishAttack()
     {
-
+        isAttacking = false;
     }
     void SendHitPosition(float xValue, float damage, Direction direction)
     {
-        manager.RecievePlayerHit(xValue, damage, direction);
+        manager.RecieveOpponentHit(xValue, damage, direction);
     }
     void Cross()
     {

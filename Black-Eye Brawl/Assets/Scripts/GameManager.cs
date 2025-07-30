@@ -50,20 +50,28 @@ public class GameManager : MonoBehaviour
     }
     bool IsPlayerHit(float xValue)
     {
-        return true;
+        if (xValue < playerRightBound && xValue > playerLeftBound)
+            return true;
+        else
+            return false;
     }
     public void RecievePlayerHit(float xValue, float damage, Direction direction)
-    {
-        if(IsOpponentHit(xValue))
-        {
-            opponent.TakeDamage(damage, direction);
-        }
-    }
-    public void RecieveOpponentHit(float xValue, float damage, Direction direction)
     {
         if (IsOpponentHit(xValue))
         {
             opponent.TakeDamage(damage, direction);
+        }
+        else
+            opponent.FinishBlock();
+    }
+    public void RecieveOpponentHit(float xValue, float damage, Direction direction)
+    {
+        print(xValue);
+        print(playerRightBound);
+        print(playerLeftBound);
+        if (IsPlayerHit(xValue))
+        {
+            player.TakeDamage(damage, direction);
         }
     }
     void UpdateOpponentInfo()

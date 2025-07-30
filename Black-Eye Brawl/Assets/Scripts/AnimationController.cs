@@ -32,4 +32,32 @@ public class AnimationController : MonoBehaviour
 
         opponentAnimator.SetTrigger("Right Hook");
     }
+    public void LeftHook()
+    {
+        opponentAnimator.SetBool("isWalking", false);
+        opponentAnimator.SetBool("isIdle", true);
+
+        opponentAnimator.SetTrigger("Left Hook");
+    }
+    public void Cross()
+    {
+        opponentAnimator.SetBool("isWalking", false);
+        opponentAnimator.SetBool("isIdle", true);
+
+        opponentAnimator.SetTrigger("Cross");
+    }
+    public void Uppercut()
+    {
+        opponentAnimator.SetBool("isWalking", false);
+        opponentAnimator.SetBool("isIdle", true);
+
+        opponentAnimator.SetTrigger("Uppercut");
+    }
+    public void Hammer()
+    {
+        opponentAnimator.SetBool("isWalking", false);
+        opponentAnimator.SetBool("isIdle", true);
+
+        opponentAnimator.SetTrigger("Hammer");
+    }
 }

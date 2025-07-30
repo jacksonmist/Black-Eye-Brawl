@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class BlockScript : MonoBehaviour
 {
@@ -60,8 +61,6 @@ public class BlockScript : MonoBehaviour
     }
     void FinishBlock()
     {
-        //playerInput.ActivateInput();
-        //isBusy = false;
         isBlocking = false;
         rightArmTarget.localPosition = rightTargetHomePosition;
         leftArmTarget.localPosition = leftTargetHomePosition;
@@ -90,7 +89,6 @@ public class BlockScript : MonoBehaviour
     }
     public void DisableTargets()
     {
-        print("here");
         targetsEnabled = false;
     }
     public void EnableTargets()
@@ -99,6 +97,7 @@ public class BlockScript : MonoBehaviour
     }
     public void BlockDirection(Direction direction)
     {
+        StartCoroutine(BlockTimer());
         switch (direction)
         {
             case Direction.Up:
@@ -119,6 +118,16 @@ public class BlockScript : MonoBehaviour
             case Direction.None:
                 FinishBlock();
                 break;
+        }
+    }
+    IEnumerator BlockTimer()
+    {
+        yield return new WaitForSeconds(2);
+        print(isBlocking);
+        if(isBlocking)
+        {
+            print("here");
+            FinishBlock();
         }
     }
     void CenterBlock()
