@@ -4,6 +4,7 @@ public class AnimationController : MonoBehaviour
 {
     public Animator opponentAnimator;
     public Animator playerAnimator;
+
     void Start()
     {
         
@@ -27,37 +28,50 @@ public class AnimationController : MonoBehaviour
     }
     public void RightHook()
     {
+        print("RH");
         opponentAnimator.SetBool("isWalking", false);
         opponentAnimator.SetBool("isIdle", true);
 
-        opponentAnimator.SetTrigger("Right Hook");
+        opponentAnimator.SetBool("Right Hook", true);
     }
     public void LeftHook()
     {
+        print("LH");
         opponentAnimator.SetBool("isWalking", false);
         opponentAnimator.SetBool("isIdle", true);
 
-        opponentAnimator.SetTrigger("Left Hook");
+        opponentAnimator.SetBool("Left Hook", true);
     }
     public void Cross()
     {
+        print("C");
         opponentAnimator.SetBool("isWalking", false);
         opponentAnimator.SetBool("isIdle", true);
 
-        opponentAnimator.SetTrigger("Cross");
+        opponentAnimator.SetBool("Cross", true);
     }
     public void Uppercut()
     {
+        print("U");
         opponentAnimator.SetBool("isWalking", false);
         opponentAnimator.SetBool("isIdle", true);
 
-        opponentAnimator.SetTrigger("Uppercut");
+        opponentAnimator.SetBool("Uppercut", true);
     }
     public void Hammer()
     {
+        print("H");
         opponentAnimator.SetBool("isWalking", false);
         opponentAnimator.SetBool("isIdle", true);
 
-        opponentAnimator.SetTrigger("Hammer");
+        opponentAnimator.SetBool("Hammer", true);
+    }
+    public void EndAnimation()
+    {
+        opponentAnimator.SetBool("Right Hook", false);
+        opponentAnimator.SetBool("Left Hook", false);
+        opponentAnimator.SetBool("Cross", false);
+        opponentAnimator.SetBool("Uppercut", false);
+        opponentAnimator.SetBool("Hammer", false);
     }
 }

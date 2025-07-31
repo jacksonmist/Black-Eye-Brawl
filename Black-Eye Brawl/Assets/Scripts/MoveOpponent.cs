@@ -42,11 +42,11 @@ public class MoveOpponent : MonoBehaviour
     public float hammerDamage = 25;
 
     [Header("Attack Speeds")]
-    public float crossSpeed = 0.5f;
+    public float crossSpeed = 1f;
     public float jabSpeed = 0.25f;
     public float hookSpeed = 1.5f;
-    public float uppercutSpeed = 1f;
-    public float hammerSpeed = 1.5f;
+    public float uppercutSpeed = 1.75f;
+    public float hammerSpeed = 2f;
     void Start()
     {
         blockDirection = Direction.Left;
@@ -249,30 +249,35 @@ public class MoveOpponent : MonoBehaviour
         {
             animationController.Cross();
             yield return new WaitForSeconds(crossSpeed);
+            animationController.EndAnimation();
             Cross();
         }           
         else if (randInt <= 40)
         {
             animationController.RightHook();
             yield return new WaitForSeconds(hookSpeed);
+            animationController.EndAnimation();
             RightHook();
         }         
         else if (randInt <= 60)
         {
             animationController.LeftHook();
             yield return new WaitForSeconds(hookSpeed);
+            animationController.EndAnimation();
             LeftHook();
         }          
         else if (randInt <= 80)
         {
             animationController.Uppercut();
-            yield return new WaitForSeconds(hookSpeed);
+            yield return new WaitForSeconds(uppercutSpeed);
+            animationController.EndAnimation();
             Uppercut();
         }          
         else
         {
             animationController.Hammer();
-            yield return new WaitForSeconds(hookSpeed);
+            yield return new WaitForSeconds(hammerSpeed);
+            animationController.EndAnimation();
             Hammer();
         }
             
@@ -297,8 +302,6 @@ public class MoveOpponent : MonoBehaviour
     }
     void RightHook()
     {
-        animationController.RightHook();
-
         float hitPosition = transform.position.x - 0.5f;
         SendHitPosition(hitPosition, rightHookDamage, Direction.Right);
         FinishAttack();

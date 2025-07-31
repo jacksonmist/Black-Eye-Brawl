@@ -66,9 +66,6 @@ public class GameManager : MonoBehaviour
     }
     public void RecieveOpponentHit(float xValue, float damage, Direction direction)
     {
-        print(xValue);
-        print(playerRightBound);
-        print(playerLeftBound);
         if (IsPlayerHit(xValue))
         {
             player.TakeDamage(damage, direction);
