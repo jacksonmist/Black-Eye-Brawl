@@ -162,6 +162,8 @@ public class MovePlayer : MonoBehaviour
         else
         {
             playerHealth -= damage;
+            if (playerHealth <= 0)
+                playerHealth = 0;
         }
 
         if (playerStamina < 0)
