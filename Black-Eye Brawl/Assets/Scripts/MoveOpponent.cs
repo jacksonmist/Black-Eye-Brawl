@@ -12,6 +12,7 @@ public class MoveOpponent : MonoBehaviour
 
     public Direction blockDirection;
 
+    public UIController ui;
     public GameManager manager;
 
     public Coroutine parentCoroutine;
@@ -87,6 +88,8 @@ public class MoveOpponent : MonoBehaviour
         if (opponentHealth < 0)
             opponentHealth = 0;
 
+        ui.RecieveOpponentValues(opponentHealth, opponentStamina);
+
         parentCoroutine = StartCoroutine(WaitForStaminaRegen());
     }
     bool CheckBlock(Direction direction)
@@ -115,7 +118,8 @@ public class MoveOpponent : MonoBehaviour
     {
         yield return new WaitForSeconds(regenRate);
         opponentStamina += 1;
-        if(opponentStamina >= 100)
+        ui.RecieveOpponentValues(opponentHealth, opponentStamina);
+        if (opponentStamina >= 100)
         {
             opponentStamina = 100;
             yield break;

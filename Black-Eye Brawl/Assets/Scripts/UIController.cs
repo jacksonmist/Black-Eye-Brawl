@@ -29,8 +29,8 @@ public class UIController : MonoBehaviour
         playerHealth = (health / 100f);
         playerStamina = (stamina / 100f);
 
-        Vector2 healthVector = new Vector2(playerHealth, 0f);
-        Vector2 staminaVector = new Vector2(playerStamina, 0f);
+        Vector2 healthVector = new Vector2(playerHealth, 1f);
+        Vector2 staminaVector = new Vector2(playerStamina, 1f);
 
         playerHealthBar.localScale = healthVector;
         playerStaminaBar.localScale = staminaVector;
@@ -40,8 +40,8 @@ public class UIController : MonoBehaviour
         opponentHealth = (health / 100f);
         opponentStamina = (stamina / 100f);
 
-        Vector2 healthVector = new Vector2(opponentHealth, 0f);
-        Vector2 staminaVector = new Vector2(opponentStamina, 0f);
+        Vector2 healthVector = new Vector2(opponentHealth, 1f);
+        Vector2 staminaVector = new Vector2(opponentStamina, 1f);
 
         opponentHealthBar.localScale = healthVector;
         opponentStaminaBar.localScale = staminaVector;

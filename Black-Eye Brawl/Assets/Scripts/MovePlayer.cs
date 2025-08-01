@@ -11,6 +11,7 @@ public class MovePlayer : MonoBehaviour
 
     public Direction blockDirection;
 
+    public UIController ui;
     public GameManager manager;
 
     public float moveVal;
@@ -169,6 +170,8 @@ public class MovePlayer : MonoBehaviour
         if (playerStamina < 0)
             playerStamina = 0;
 
+        ui.RecievePlayerValues(playerHealth, playerStamina);
+
         parentCoroutine = StartCoroutine(WaitForStaminaRegen());
     }
     IEnumerator WaitForStaminaRegen()
@@ -180,6 +183,7 @@ public class MovePlayer : MonoBehaviour
     {
         yield return new WaitForSeconds(regenRate);
         playerStamina += 1;
+        ui.RecievePlayerValues(playerHealth, playerStamina);
         if (playerStamina >= 100)
         {
             playerStamina = 100;

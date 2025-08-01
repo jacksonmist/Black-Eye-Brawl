@@ -603,6 +603,7 @@ MonoBehaviour:
     m_SingletonActionBindings: []
     m_Flags: 0
   blockDirection: 0
+  ui: {fileID: 333916130}
   manager: {fileID: 154719493}
   moveVal: 0
   isAttacking: 0
@@ -1166,6 +1167,54 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraTarget: {fileID: 2085072897}
   cameraSpeed: 15
+--- !u!1 &333916129
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 333916131}
+  - component: {fileID: 333916130}
+  m_Layer: 0
+  m_Name: UI Controller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &333916130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 333916129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d4d2c8a20ee5a1409ae471c2f333ffc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerHealthBar: {fileID: 387538937}
+  playerStaminaBar: {fileID: 767506708}
+  opponentHealthBar: {fileID: 2104277219}
+  opponentStaminaBar: {fileID: 235547734}
+--- !u!4 &333916131
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 333916129}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 424.06702, y: 255.36644, z: 197.4055}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &373480314
 GameObject:
   m_ObjectHideFlags: 0
@@ -2543,7 +2592,7 @@ RectTransform:
   m_GameObject: {fileID: 1011219678}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 6.37, y: 2.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2104277219}
@@ -3410,6 +3459,7 @@ MonoBehaviour:
   staminaRecoveryCooldown: 1
   regenRate: 0.1
   blockDirection: 0
+  ui: {fileID: 333916130}
   manager: {fileID: 154719493}
   opponentSpeed: 0.6
   playerHorizontalPosition: 0
@@ -5064,7 +5114,7 @@ RectTransform:
   m_GameObject: {fileID: 2104277218}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 6.3700004, y: 1.61, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1011219679}
@@ -6933,3 +6983,4 @@ SceneRoots:
   - {fileID: 384882648}
   - {fileID: 708860466}
   - {fileID: 1350671515}
+  - {fileID: 333916131}
