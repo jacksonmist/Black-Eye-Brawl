@@ -28,7 +28,6 @@ public class AnimationController : MonoBehaviour
     }
     public void RightHook()
     {
-        print("RH");
         opponentAnimator.SetBool("isWalking", false);
         opponentAnimator.SetBool("isIdle", true);
 
@@ -36,7 +35,6 @@ public class AnimationController : MonoBehaviour
     }
     public void LeftHook()
     {
-        print("LH");
         opponentAnimator.SetBool("isWalking", false);
         opponentAnimator.SetBool("isIdle", true);
 
@@ -44,7 +42,6 @@ public class AnimationController : MonoBehaviour
     }
     public void Cross()
     {
-        print("C");
         opponentAnimator.SetBool("isWalking", false);
         opponentAnimator.SetBool("isIdle", true);
 
@@ -52,7 +49,6 @@ public class AnimationController : MonoBehaviour
     }
     public void Uppercut()
     {
-        print("U");
         opponentAnimator.SetBool("isWalking", false);
         opponentAnimator.SetBool("isIdle", true);
 
@@ -60,7 +56,6 @@ public class AnimationController : MonoBehaviour
     }
     public void Hammer()
     {
-        print("H");
         opponentAnimator.SetBool("isWalking", false);
         opponentAnimator.SetBool("isIdle", true);
 
@@ -73,5 +68,35 @@ public class AnimationController : MonoBehaviour
         opponentAnimator.SetBool("Cross", false);
         opponentAnimator.SetBool("Uppercut", false);
         opponentAnimator.SetBool("Hammer", false);
+    }
+
+    public void RightHookPlayer()
+    {
+        print("hook");
+        playerAnimator.SetBool("Right Hook", true);
+    }
+    public void LeftHookPlayer()
+    {
+        playerAnimator.SetBool("Left Hook", true);
+    }
+    public void CrossPlayer()
+    {
+        playerAnimator.SetBool("Cross", true);
+    }
+    public void UppercutPlayer()
+    {
+        playerAnimator.SetBool("Uppercut", true);
+    }
+    public void HammerPlayer()
+    {
+        playerAnimator.SetBool("Hammer", true);
+    }
+    public void EndAnimationPlayer()
+    {
+        playerAnimator.SetBool("Right Hook", false);
+        playerAnimator.SetBool("Left Hook", false);
+        playerAnimator.SetBool("Cross", false);
+        playerAnimator.SetBool("Uppercut", false);
+        playerAnimator.SetBool("Hammer", false);
     }
 }

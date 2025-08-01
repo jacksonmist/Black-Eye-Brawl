@@ -123,10 +123,8 @@ public class BlockScript : MonoBehaviour
     IEnumerator BlockTimer()
     {
         yield return new WaitForSeconds(2);
-        print(isBlocking);
         if(isBlocking)
         {
-            print("here");
             FinishBlock();
         }
     }

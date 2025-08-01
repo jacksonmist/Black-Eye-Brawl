@@ -11,6 +11,7 @@ public class MovePlayer : MonoBehaviour
 
     public Direction blockDirection;
 
+    public AnimationController animationController;
     public UIController ui;
     public GameManager manager;
 
@@ -237,6 +238,7 @@ public class MovePlayer : MonoBehaviour
         if (magnitude < crossBoundary)
         {
             SendAttackDirection(Direction.Center);
+            animationController.CrossPlayer();
             yield return new WaitForSeconds(crossSpeed);
             Cross();
         }
@@ -245,24 +247,29 @@ public class MovePlayer : MonoBehaviour
             if (angle > 45 && angle <= 135)
             {
                 SendAttackDirection(Direction.Down);
+                animationController.UppercutPlayer();
                 yield return new WaitForSeconds(uppercutSpeed);               
                 Uppercut();
             }               
             else if (angle > 135 && angle <= 225)
             {
                 SendAttackDirection(Direction.Left);
+                animationController.LeftHookPlayer();
                 yield return new WaitForSeconds(hookSpeed);
                 LeftHook();
             }                
             else if (angle > 225 && angle <= 315)
             {
                 SendAttackDirection(Direction.Up);
+                animationController.HammerPlayer();
                 yield return new WaitForSeconds(hammerSpeed);
                 Hammer();
             }               
             else if (angle > 315 || angle <= 45)
             {
                 SendAttackDirection(Direction.Right);
+                print("right");
+                animationController.RightHookPlayer();
                 yield return new WaitForSeconds(hookSpeed);
                 RightHook();
             }             
@@ -274,6 +281,8 @@ public class MovePlayer : MonoBehaviour
     }
     void FinishAttack()
     {
+        print("Finished");
+        animationController.EndAnimationPlayer();
         playerInput.ActivateInput();
         isBusy = false;
         isAttacking = false;
