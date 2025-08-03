@@ -11,7 +11,10 @@ public enum Direction
 };
 public class GameManager : MonoBehaviour
 {
-    
+    public UIController ui;
+    public GameObject playerObj;
+    public GameObject opponentObj;
+
     public MovePlayer player;
     public MoveOpponent opponent;
 
@@ -32,6 +35,28 @@ public class GameManager : MonoBehaviour
     {
         CalculateBoundingBoxes();
         UpdateOpponentInfo();
+    }
+
+    public void StartGame()
+    {
+        playerObj.SetActive(true);
+        opponentObj.SetActive(true);
+    }
+    void EndGame()
+    {
+        player.UnlockCursor();
+        playerObj.SetActive(false);
+        opponentObj.SetActive(false);
+    }
+    public void PlayerLoss()
+    {
+        EndGame();
+        ui.Loss();
+    }
+    public void OpponentLoss()
+    {
+        EndGame();
+        ui.Win();
     }
     void CalculateBoundingBoxes()
     {

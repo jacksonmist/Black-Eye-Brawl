@@ -12,6 +12,7 @@ public class MoveOpponent : MonoBehaviour
 
     public Direction blockDirection;
 
+    public AudioManager audioManager;
     public UIController ui;
     public GameManager manager;
 
@@ -33,6 +34,9 @@ public class MoveOpponent : MonoBehaviour
     public float actionCooldown = 0.5f;
 
     public BlockScript block;
+
+    public float staminaBreak = 3f;
+    bool isBroken;
 
     [Header("Attack Damages")]
     public float crossDamage = 10;
@@ -56,6 +60,7 @@ public class MoveOpponent : MonoBehaviour
 
         DecideAction();
         blockDirection = Direction.None;
+        isBroken = false;
     }
 
     void Update()
@@ -67,7 +72,8 @@ public class MoveOpponent : MonoBehaviour
 
     public void TakeDamage(float damage, Direction direction)
     {
-        if(parentCoroutine != null)
+        audioManager.PlayerHitSound();
+        if (parentCoroutine != null)
             StopCoroutine(parentCoroutine);
         if(childCoroutine != null)
             StopCoroutine(childCoroutine);
@@ -76,17 +82,22 @@ public class MoveOpponent : MonoBehaviour
         if (CheckBlock(direction))
         {
             opponentStamina -= (damage * 2);
-            if (opponentStamina < 0)
+            if (opponentStamina <= 0)
                 opponentStamina = 0;
             FinishBlock();
         }
         else
         {
+            audioManager.PlayerGroanSound();
             opponentHealth -= damage;
         }
         
-        if (opponentHealth < 0)
+        if (opponentHealth <= 0)
+        {
             opponentHealth = 0;
+            manager.OpponentLoss();
+        }
+            
 
         ui.RecieveOpponentValues(opponentHealth, opponentStamina);
 
@@ -144,7 +155,7 @@ public class MoveOpponent : MonoBehaviour
     }
     public void RecieveAttackDirection(Direction direction)
     {
-        if (isAttacking)
+        if (isAttacking || isBroken)
             return;
 
         int randInt = RNG();
@@ -160,13 +171,13 @@ public class MoveOpponent : MonoBehaviour
                 blockChance = 50;
                 break;
             case Direction.Left:
-                blockChance = 30;
+                blockChance = 40;
                 break;
             case Direction.Right:
                 blockChance = 40;
                 break;
             case Direction.Center:
-                blockChance = 20;
+                blockChance = 35;
                 break;
         }
         if (randInt < blockChance)
@@ -175,6 +186,9 @@ public class MoveOpponent : MonoBehaviour
 
     void DecideAction()
     {
+        if (isBroken)
+            return;
+
         int randInt = RNG();
         float attackChance = baseAttackChance;
 
@@ -244,7 +258,7 @@ public class MoveOpponent : MonoBehaviour
     }
     IEnumerator Attack()
     {
-        if (isBlocking)
+        if (isBlocking || isBroken)
             yield break;
 
         float randInt = RNG();
@@ -338,5 +352,12 @@ public class MoveOpponent : MonoBehaviour
     {
         yield return new WaitForSeconds(actionInterval);
         DecideAction();
+    }
+
+    IEnumerator StaminaBreak()
+    {
+        isBroken = true;
+        yield return new WaitForSeconds(staminaBreak);
+        isBroken = false;
     }
 }

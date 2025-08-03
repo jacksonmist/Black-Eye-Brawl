@@ -8,9 +8,11 @@ public class MovePlayer : MonoBehaviour
     public InputAction moveAction;
     public InputAction attackAction;
     public InputAction blockAction;
+    public Animator playerAnimator;
 
     public Direction blockDirection;
 
+    public AudioManager audioManager;
     public AnimationController animationController;
     public UIController ui;
     public GameManager manager;
@@ -37,6 +39,10 @@ public class MovePlayer : MonoBehaviour
 
     float startingY;
     float startingZ;
+
+    bool targetsEnabled;
+
+    public float staminaBreakTimer = 3f;
 
     [Header("Attack Damages")]
     public float crossDamage = 10;
@@ -116,12 +122,14 @@ public class MovePlayer : MonoBehaviour
         homeRotationTarget = rightFist.rotation;
 
         LockCursor();
+        EnableTargets();
     }
 
     void Update()
     {
         ReadActions();
-        ArmsToTarget();
+        if(targetsEnabled)
+            ArmsToTarget();
     }
 
     void ReadActions()
@@ -149,6 +157,7 @@ public class MovePlayer : MonoBehaviour
     }
     public void TakeDamage(float damage, Direction direction)
     {
+        audioManager.PlayerHitSound();
         if (parentCoroutine != null)
             StopCoroutine(parentCoroutine);
         if (childCoroutine != null)
@@ -158,14 +167,23 @@ public class MovePlayer : MonoBehaviour
         if (CheckBlock(direction))
         {
             playerStamina -= (damage * 2);
-            if (playerStamina < 0)
+            if (playerStamina <= 0)
+            {
                 playerStamina = 0;
+                StartCoroutine(StaminaBreak());
+            }
+                
         }
         else
         {
             playerHealth -= damage;
             if (playerHealth <= 0)
+            {
                 playerHealth = 0;
+                manager.PlayerLoss();
+            }
+                
+            audioManager.PlayerGroanSound();
         }
 
         if (playerStamina < 0)
@@ -234,7 +252,9 @@ public class MovePlayer : MonoBehaviour
     }
     IEnumerator DecideAttack(float magnitude, float angle)
     {
+        playerAnimator.enabled = true;
         playerInput.DeactivateInput();
+        DisableTargets();
         if (magnitude < crossBoundary)
         {
             SendAttackDirection(Direction.Center);
@@ -281,7 +301,8 @@ public class MovePlayer : MonoBehaviour
     }
     void FinishAttack()
     {
-        print("Finished");
+        playerAnimator.enabled = false;
+        EnableTargets();
         animationController.EndAnimationPlayer();
         playerInput.ActivateInput();
         isBusy = false;
@@ -334,6 +355,7 @@ public class MovePlayer : MonoBehaviour
     }
     void FinishBlock()
     {
+        EnableTargets();
         playerInput.ActivateInput();
         isBusy = false;
         isBlocking = false;
@@ -376,6 +398,8 @@ public class MovePlayer : MonoBehaviour
     }
     void DecideBlock(float magnitude, float angle)
     {
+        EnableTargets();
+        playerAnimator.enabled = false;
         if (magnitude < crossBoundary)
             CenterBlock();
         else
@@ -448,7 +472,7 @@ public class MovePlayer : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
-    void UnlockCursor()
+    public void UnlockCursor()
     {
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = true;
@@ -458,6 +482,22 @@ public class MovePlayer : MonoBehaviour
         Vector2 mousePosition = Input.mousePosition;
         mousePosition -= screenCenter;
         return mousePosition;
+    }
+
+    public void DisableTargets()
+    {
+        targetsEnabled = false;
+    }
+    public void EnableTargets()
+    {
+        targetsEnabled = true;
+    }
+
+    IEnumerator StaminaBreak()
+    {
+        playerInput.DeactivateInput();
+        yield return new WaitForSeconds(staminaBreakTimer);
+        playerInput.ActivateInput();
     }
 }
 
